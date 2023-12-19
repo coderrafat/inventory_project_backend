@@ -8,5 +8,9 @@ userRouter.post('/login', userLoginController);
 
 userRouter.post('/send-otp', userSentOtpController);
 
+userRouter.get('/test', (req, res) => {
+    res.send('Test')
+})
+
 
 module.exports = userRouter;
