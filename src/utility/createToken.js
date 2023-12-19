@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 
-exports.createToken = async (email, user_id) => {
+exports.createToken = async (email, user_id, expires) => {
 
     return jwt.sign(
         { email: email, id: user_id },

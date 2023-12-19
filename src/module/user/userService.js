@@ -74,7 +74,7 @@ exports.userLoginService = async (userData) => {
         throw createError(404, 'Your email is not verified')
     }
 
-    const token = await createToken(user.email, user._id);
+    const token = await createToken(user.email, user._id, '24h');
 
     return {
         success: true,
