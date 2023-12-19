@@ -9,7 +9,7 @@ userRouter.post('/login', userLoginController);
 userRouter.post('/send-otp', userSentOtpController);
 
 userRouter.get('/test', (req, res) => {
-    res.send('Test')
+    res.send('Success on deploy backend to vercel')
 })
 
 
