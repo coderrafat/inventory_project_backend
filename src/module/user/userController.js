@@ -5,8 +5,12 @@
  * @author Ali Rafat
 */
 
-const { userRegisterService, userLoginService, userSentOtpService } = require("./userService");
-const { userRegisterSchema, userSentOtpSchema, userLoginSchema } = require("./userValidationSchema");
+const { userRegisterSchema, userLoginSchema, userProfileUpdateSchema, userPasswordUpdateSchema, userEmailVerifySchema, userPasswordResetSchema } = require("./userValidationSchema");
+const userModel = require("./userModel");
+const { userRegisterService } = require("./services/userRegistration");
+const { userLoginService } = require("./services/userLoginService");
+const { userProfile, userProfileUpdate, userPasswordUpdate, userEmailUpdateService, userPasswordResetService } = require("./services/userProfileService");
+const { userEmailVerify } = require("./services/emailVerify");
 
 
 /**
@@ -32,7 +36,7 @@ exports.userRegisterController = async (req, res, next) => {
     try {
         const userData = await userRegisterSchema.validateAsync(req.body);
 
-        const result = await userRegisterService(userData);
+        const result = await userRegisterService(userModel, userData);
 
         return res.status(200).json(result);
     } catch (error) {
@@ -41,6 +45,15 @@ exports.userRegisterController = async (req, res, next) => {
 };
 
 
+exports.userEmailVerifyController = async (req, res, next) => {
+    try {
+        const data = await userEmailVerifySchema.validateAsync(req.body)
+        const result = await userEmailVerify(userModel, data)
+        return res.status(200).json(result)
+    } catch (error) {
+        next(error)
+    }
+};
 
 
 
@@ -48,7 +61,7 @@ exports.userLoginController = async (req, res, next) => {
     try {
         const userData = await userLoginSchema.validateAsync(req.body);
 
-        const result = await userLoginService(userData);
+        const result = await userLoginService(userModel, userData);
 
         return res.status(200).json(result);
     } catch (error) {
@@ -56,14 +69,77 @@ exports.userLoginController = async (req, res, next) => {
     }
 };
 
-exports.userSentOtpController = async (req, res, next) => {
+
+
+exports.userProfileController = async (req, res, next) => {
     try {
-        const userData = await userSentOtpSchema.validateAsync(req.body);
+        const { id } = req.user;
+        console.log(id)
+        const result = await userProfile(userModel, id);
+        return res.status(200).json(result);
+    } catch (error) {
+        next(error)
+    }
+};
 
-        const result = await userSentOtpService(userData);
+
+
+exports.userProfileUpdateController = async (req, res, next) => {
+    try {
+        const { id } = req.user;
+
+        const data = await userProfileUpdateSchema.validateAsync(req.body);
+
+        const result = await userProfileUpdate(userModel, data, id);
 
         return res.status(200).json(result);
     } catch (error) {
-        next(error);
+        next(error)
     }
 };
+
+
+
+exports.userPasswordUpdateController = async (req, res, next) => {
+    try {
+        const { id } = req.user;
+
+        const data = await userPasswordUpdateSchema.validateAsync(req.body);
+
+        const result = await userPasswordUpdate(userModel, id, data);
+        return res.status(200).json(result);
+    } catch (error) {
+        next(error)
+    }
+};
+
+
+exports.userPasswordResetController = async (req, res, next) => {
+    try {
+        const data = await userPasswordResetSchema.validateAsync(req.body);
+
+        const result = await userPasswordResetService(userModel, data);
+
+        return res.status(200).json(result);
+    } catch (error) {
+        next(error)
+    }
+}
+
+
+
+exports.userEmailUpdateController = async (req, res, next) => {
+    try {
+
+        const { id } = req.user;
+        const data = await userEmailVerifySchema.validateAsync(req.body)
+
+        const result = await userEmailUpdateService(userModel, data, id);
+
+        return res.status(200).jason(result)
+    } catch (error) {
+        next(error)
+    }
+};
+
+

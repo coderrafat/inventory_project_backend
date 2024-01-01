@@ -3,8 +3,9 @@ const express = require('express');
 const app = express();
 require('dotenv').config();
 const port = process.env.PORT || 6000;
-const { connectDB } = require('./src/utility/connectDB');
-const router = require('./src/router');
+const { connectDB } = require('./utility/connectDB');
+const router = require('./router');
+// const parseFormData = require('./middlewares/parseFormData');
 
 
 //!Error handler
@@ -17,6 +18,9 @@ const cors = require('cors');
 const helmet = require('helmet');
 const xss = require('xss-clean');
 const hpp = require('hpp');
+
+// app.use(parseFormData)
+
 
 //!Rate limiting
 const limiter = rateLimit({

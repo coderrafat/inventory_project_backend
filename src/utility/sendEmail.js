@@ -27,7 +27,6 @@ exports.sendEmail = async (emailData) => {
         return await transpoter.sendMail(mailOptions);
 
     } catch (error) {
-        console.log(error)
         return { success: false, message: 'Something went wrong' }
     }
 };
