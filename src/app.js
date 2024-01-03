@@ -30,6 +30,17 @@ const limiter = rateLimit({
 });
 
 
+//! Only for accept my client side application
+// app.use((req, res, next) => {
+//     const myClientApplication = req.headers.origin;
+
+//     if (myClientApplication !== "") {
+//         throw createError(406, "Your request not acceptable");
+//     }
+//     next();
+// });
+
+
 //!Security middlewares implement
 app.use(cors());
 app.use(helmet());
