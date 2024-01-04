@@ -1,11 +1,11 @@
 const { createParentChildService } = require("../common/services/createParentChild");
 const { deleteParentChildService } = require("../common/services/deleteParentChild");
 const { findDataService } = require("../common/services/findDataService");
-const purchaseModel = require("./models/purchaseModel");
-const purchaseProductsModel = require("./models/purchaseProductsModel");
+const sellModel = require("./models/sellModel");
+const sellProductsModel = require("./models/sellProductsModel");
 
 
-exports.purchaseCreateController = async (req, res, next) => {
+exports.sellCreateController = async (req, res, next) => {
     try {
         const { id } = req.user;
 
@@ -14,15 +14,15 @@ exports.purchaseCreateController = async (req, res, next) => {
 
         let data = {};
         let dataModel = {
-            parentModel: purchaseModel,
-            childModel: purchaseProductsModel
+            parentModel: sellModel,
+            childModel: sellProductsModel
         };
 
         data.userId = id;
         data.parent = parent;
         data.child = child;
         data.message = 'New Purchase has been Created!';
-        data.joinPropertyName = 'purchaseId';
+        data.joinPropertyName = 'sellId';
 
         const result = await createParentChildService(dataModel, data);
 
@@ -35,7 +35,7 @@ exports.purchaseCreateController = async (req, res, next) => {
 
 
 
-exports.purchaseFindController = async (req, res, next) => {
+exports.sellFindController = async (req, res, next) => {
     try {
         const { id } = req.user;
         const { search } = req.query;
@@ -46,10 +46,10 @@ exports.purchaseFindController = async (req, res, next) => {
 
         const join = {
             $lookup: {
-                from: 'purchases',
-                localField: 'purchaseId',
+                from: 'sells',
+                localField: 'sellId',
                 foreignField: '_id',
-                as: 'purchase'
+                as: 'sell'
             }
         };
         const join2 = {
@@ -64,9 +64,9 @@ exports.purchaseFindController = async (req, res, next) => {
         if (search) {
             const searchRgx = { $regex: search, "$options": "i" };
             const searchArray = [
-                { 'purchase.note': searchRgx },
-                { 'product.name': searchRgx },
-                { 'product.details': searchRgx }
+                { 'sell.note': searchRgx },
+                { 'sell.name': searchRgx },
+                { 'sell.details': searchRgx }
             ]
             data.searchArray = searchArray;
         }
@@ -77,7 +77,7 @@ exports.purchaseFindController = async (req, res, next) => {
         data.page = page;
         data.limit = limit;
 
-        const result = await findDataService(purchaseProductModel, data);
+        const result = await findDataService(sellProductsModel, data);
 
         return res.status(200).json(result);
 
@@ -87,20 +87,21 @@ exports.purchaseFindController = async (req, res, next) => {
 };
 
 
-
-exports.purchaseDeleteController = async (req, res, next) => {
+exports.sellDeleteController = async (req, res, next) => {
     try {
         const userId = req.user.id;
         const { id } = req.params;
 
         const dataModel = {
-            parentModel: purchaseModel,
-            childModel: purchaseProductsModel
+            parentModel: sellModel,
+            childModel: sellProductsModel
         }
+
         const data = {
             userId,
             id,
-            joinPropertyName: 'purchaseId'
+            message: 'Sell has been deleted!',
+            joinPropertyName: 'sellId'
         };
 
         const result = await deleteParentChildService(dataModel, data);

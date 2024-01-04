@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-exports.createParentChidService = async (dataModel, data) => {
+exports.createParentChildService = async (dataModel, data) => {
     const session = await mongoose.startSession();
 
     try {
@@ -8,22 +8,22 @@ exports.createParentChidService = async (dataModel, data) => {
 
         data.parent.userId = data.userId;
 
-        const parentModel = dataModel.parentModel;
-
-        const parent = data.parent;
-
-        const createParent = await parentModel.create([parent], { session });
+        const createParent = await dataModel.parentModel.create(
+            [data.parent],
+            { session }
+        );
 
         data.child.forEach((element) => {
             element[data.joinPropertyName] = createParent[0]['_id'];
             element.userId = data.userId;
         });
 
-
-        const createChild = await dataModel['childModel'].insertMany(data.child, { session });
+        const createChild = await dataModel.childModel.insertMany(
+            data.child,
+            { session }
+        );
 
         await session.commitTransaction();
-
         session.endSession();
 
         return {
@@ -41,5 +41,4 @@ exports.createParentChidService = async (dataModel, data) => {
         console.error(error)
         return { success: "false", error: error.message }
     }
-
 }

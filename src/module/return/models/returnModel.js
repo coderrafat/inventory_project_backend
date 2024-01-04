@@ -1,37 +1,40 @@
 const { Schema, model } = require('mongoose');
 
-const purchaseProductsSchema = new Schema({
+const returnSchema = new Schema({
     userId: {
         type: Schema.Types.ObjectId,
         ref: 'users',
         required: true
     },
-    purchaseId: {
+    customerId: {
         type: Schema.Types.ObjectId,
-        ref: 'purchases',
+        ref: 'customers',
         required: true
     },
-    productId: {
-        type: Schema.Types.ObjectId,
-        ref: 'products',
-        required: true
-    },
-    qty: {
+    vatTax: {
         type: Number,
         required: true
     },
-    unit: {
+    discount: {
+        type: Number,
+    },
+    shippingCost: {
+        type: Number
+    },
+    otherCost: {
+        type: Number
+    },
+    grandTotal: {
         type: Number,
         required: true
     },
-    total: {
-        type: Number,
-        required: true
+    note: {
+        type: String,
+        required: true,
+        trim: true
     }
-
 }, { timestamps: true, versionKey: false });
 
+const returnModel = model('returns', returnSchema);
 
-const purchaseProductsModel = model('purchaseProducts', purchaseProductsSchema);
-
-module.exports = purchaseProductsModel;
+module.exports = returnModel;

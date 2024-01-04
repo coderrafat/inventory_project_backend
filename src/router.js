@@ -5,6 +5,8 @@ const expenseRouter = require('./module/expense/expenseRouter');
 const expenseTypeRouter = require('./module/expense/expenseType/expenseTypeRouter');
 const productRouter = require('./module/product/productRouter');
 const purchaseRouter = require('./module/purchase/purchaseRouter');
+const returnRouter = require('./module/return/returnRouter');
+const sellRouter = require('./module/sell/sellRouter');
 const supplierRouter = require('./module/supplier/supplierRouter');
 const userRouter = require('./module/user/userRouter');
 const verificationRouter = require('./module/user/verification/verificationRouter');
@@ -30,6 +32,10 @@ router.use('/expense', expenseRouter);
 router.use('/product', productRouter);
 
 router.use('/purchase', purchaseRouter);
+
+router.use('/sell', sellRouter);
+
+router.use('/return', returnRouter);
 
 
 module.exports = router;

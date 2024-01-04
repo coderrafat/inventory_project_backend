@@ -22,23 +22,43 @@ exports.findDataService = async (dataModel, data) => {
     const startIndex = (data.page - 1) * data.limit;
     const endIndex = data.page * data.limit;
 
+    console.log(data.join3)
+
+
     if (data.searchArray) {
         if (data.join) {
             if (data.join2) {
-                allData = await dataModel.aggregate([
-                    { $match: { userId: new Types.ObjectId(data.userId) } },
-                    data.join, data.join2,
-                    { $match: { $or: data.searchArray } },
-                    {
-                        $facet: {
-                            countTotal: [{ $count: "total" }],
-                            row: [{ $skip: startIndex }, { $limit: data.limit }]
+                if (data.join3) {
+                    allData = await dataModel.aggregate([
+                        { $match: { userId: new Types.ObjectId(data.userId) } },
+                        data.join, data.join2, data.join3,
+                        { $match: { $or: data.searchArray } },
+                        {
+                            $facet: {
+                                countTotal: [{ $count: "total" }],
+                                row: [{ $skip: startIndex }, { $limit: data.limit }]
+                            }
                         }
-                    }
-                ])
+                    ])
 
-                dataCount = allData[0].countTotal[0].total
-                allData = allData[0].row
+                    dataCount = allData[0].countTotal[0].total
+                    allData = allData[0].row
+                } else {
+                    allData = await dataModel.aggregate([
+                        { $match: { userId: new Types.ObjectId(data.userId) } },
+                        data.join, data.join2,
+                        { $match: { $or: data.searchArray } },
+                        {
+                            $facet: {
+                                countTotal: [{ $count: "total" }],
+                                row: [{ $skip: startIndex }, { $limit: data.limit }]
+                            }
+                        }
+                    ])
+
+                    dataCount = allData[0].countTotal[0].total
+                    allData = allData[0].row
+                }
 
             } else {
                 allData = await dataModel.aggregate([
@@ -76,19 +96,35 @@ exports.findDataService = async (dataModel, data) => {
     } else {
         if (data.join) {
             if (data.join2) {
-                allData = await dataModel.aggregate([
-                    { $match: { userId: new Types.ObjectId(data.userId) } },
-                    data.join, data.join2,
-                    {
-                        $facet: {
-                            countTotal: [{ $count: "total" }],
-                            row: [{ $skip: startIndex }, { $limit: data.limit }]
+                if (data.join3) {
+                    allData = await dataModel.aggregate([
+                        { $match: { userId: new Types.ObjectId(data.userId) } },
+                        data.join, data.join2, data.join3,
+                        {
+                            $facet: {
+                                countTotal: [{ $count: "total" }],
+                                row: [{ $skip: startIndex }, { $limit: data.limit }]
+                            }
                         }
-                    }
-                ])
+                    ])
 
-                dataCount = allData[0].countTotal[0].total
-                allData = allData[0].row
+                    dataCount = allData[0].countTotal[0].total
+                    allData = allData[0].row
+                } else {
+                    allData = await dataModel.aggregate([
+                        { $match: { userId: new Types.ObjectId(data.userId) } },
+                        data.join, data.join2,
+                        {
+                            $facet: {
+                                countTotal: [{ $count: "total" }],
+                                row: [{ $skip: startIndex }, { $limit: data.limit }]
+                            }
+                        }
+                    ])
+
+                    dataCount = allData[0].countTotal[0].total
+                    allData = allData[0].row
+                }
             } else {
                 allData = await dataModel.aggregate([
                     { $match: { userId: new Types.ObjectId(data.userId) } },

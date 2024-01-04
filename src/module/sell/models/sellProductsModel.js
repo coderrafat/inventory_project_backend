@@ -1,14 +1,14 @@
 const { Schema, model } = require('mongoose');
 
-const purchaseProductsSchema = new Schema({
+const sellProductSchema = new Schema({
     userId: {
         type: Schema.Types.ObjectId,
         ref: 'users',
         required: true
     },
-    purchaseId: {
+    sellId: {
         type: Schema.Types.ObjectId,
-        ref: 'purchases',
+        ref: 'sells',
         required: true
     },
     productId: {
@@ -32,6 +32,6 @@ const purchaseProductsSchema = new Schema({
 }, { timestamps: true, versionKey: false });
 
 
-const purchaseProductsModel = model('purchaseProducts', purchaseProductsSchema);
+const sellProductsModel = model('sellProducts', sellProductSchema);
 
-module.exports = purchaseProductsModel;
+module.exports = sellProductsModel;
