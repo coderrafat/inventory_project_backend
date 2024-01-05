@@ -1,9 +1,14 @@
+const { checkExitDocumentService } = require("../common/services/checkExitDocument");
 const { createService } = require("../common/services/createService");
 const { dropdownService } = require("../common/services/dropdownService");
 const { findDataService } = require("../common/services/findDataService");
 const { updateService } = require("../common/services/updateService");
+const productModel = require("../product/productModel");
 const brandModel = require("./brandModel");
-const { brandCreateSchema } = require("./brandValidation")
+const { brandCreateSchema } = require("./brandValidation");
+const { Types } = require('mongoose');
+const createError = require('http-errors');
+const { deleteService } = require("../common/services/deleteService");
 
 
 /**
@@ -148,3 +153,30 @@ exports.brandDropdownController = async (req, res, next) => {
         next(error);
     }
 };
+
+
+exports.brandDeleteController = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const userId = req.user.id;
+
+        const data = {};
+        data.id = id;
+        data.userId = userId;
+        data.message = 'Brand has been Deleted!';
+
+        const existingDocument = await checkExitDocumentService(productModel, { brandId: new Types.ObjectId(id) });
+
+
+        if (existingDocument) {
+            throw createError('Brand can not be deleted because it is associated with some products.');
+        } else {
+            const result = await deleteService(brandModel, data);
+
+            return res.status(200).json(result)
+        }
+
+    } catch (error) {
+        next(error);
+    }
+}

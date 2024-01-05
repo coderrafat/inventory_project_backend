@@ -4,6 +4,11 @@ const { findDataService } = require("../common/services/findDataService");
 const { updateService } = require("../common/services/updateService");
 const { supplierValidationSchema } = require("./supplierValidation");
 const supplierModel = require("./supplierModel");
+const { Types } = require("mongoose");
+const createError = require("http-errors");
+const { deleteService } = require("../common/services/deleteService");
+const purchaseModel = require("../purchase/models/purchaseModel");
+const { checkExitDocumentService } = require("../common/services/checkExitDocument");
 
 
 exports.supplierCreateController = async (req, res, next) => {
@@ -101,3 +106,29 @@ exports.supplierDropdownController = async (req, res, next) => {
         next(error);
     }
 };
+
+
+exports.supplierDeleteController = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const userId = req.user.id;
+
+        const data = {};
+        data.id = id;
+        data.userId = userId;
+        data.message = 'Supplier has been Deleted!';
+
+        const existingDocument = await checkExitDocumentService(purchaseModel, { supplierId: new Types.ObjectId(id) });
+
+        if (existingDocument) {
+            throw createError('Supplier can not be deleted because it is associated with purchases.');
+        } else {
+            const result = await deleteService(supplierModel, data);
+
+            return res.status(200).json(result)
+        }
+
+    } catch (error) {
+        next(error);
+    }
+}

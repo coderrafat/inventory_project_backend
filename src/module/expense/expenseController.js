@@ -1,4 +1,5 @@
 const { createService } = require("../common/services/createService");
+const { deleteService } = require("../common/services/deleteService");
 const { findDataService } = require("../common/services/findDataService");
 const { updateService } = require("../common/services/updateService");
 const expenseModel = require("./expenseModel");
@@ -88,6 +89,28 @@ exports.expenseFindController = async (req, res, next) => {
         next(error);
     }
 };
+
+
+
+exports.expenseDeleteController = async (req, res, next) => {
+    try {
+        const userId = req.user.id;
+        const expenseId = req.params.id;
+
+        const data = {
+            userId,
+            id: expenseId,
+            message: 'Expense has been deleted!'
+        };
+
+        const result = await deleteService(expenseModel, data);
+
+        return res.status(200).json(result);
+
+    } catch (error) {
+        next(error);
+    }
+}
 
 
 

@@ -1,9 +1,14 @@
+const createError = require("http-errors");
+const { checkExitDocumentService } = require("../common/services/checkExitDocument");
 const { createService } = require("../common/services/createService");
 const { dropdownService } = require("../common/services/dropdownService");
 const { findDataService } = require("../common/services/findDataService");
 const { updateService } = require("../common/services/updateService");
+const productModel = require("../product/productModel");
 const categoryModel = require("./categoryModel");
 const { categoryValidationSchema } = require("./categoryValidation");
+const { deleteService } = require("../common/services/deleteService");
+const { Types } = require("mongoose");
 
 
 exports.categoryCreateController = async (req, res, next) => {
@@ -100,3 +105,31 @@ exports.categoryDropdownController = async (req, res, next) => {
         next(error);
     }
 };
+
+
+
+
+exports.categoryDeleteController = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const userId = req.user.id;
+
+        const data = {};
+        data.id = id;
+        data.userId = userId;
+        data.message = 'Category has been Deleted!';
+
+        const existingDocument = await checkExitDocumentService(productModel, { categoryId: new Types.ObjectId(id) });
+
+        if (existingDocument) {
+            throw createError('Category can not be deleted because it is associated with products.');
+        } else {
+            const result = await deleteService(categoryModel, data);
+
+            return res.status(200).json(result)
+        }
+
+    } catch (error) {
+        next(error);
+    }
+}

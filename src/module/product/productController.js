@@ -1,8 +1,15 @@
+const { Types } = require("mongoose");
 const { createService } = require("../common/services/createService");
 const { findDataService } = require("../common/services/findDataService");
 const { updateService } = require("../common/services/updateService");
 const productModel = require("./productModel");
 const { productValidationSchema } = require("./productValidation");
+const createError = require("http-errors");
+const { deleteService } = require("../common/services/deleteService");
+const { checkExitDocumentService } = require("../common/services/checkExitDocument");
+const purchaseProductsModel = require("../purchase/models/purchaseProductsModel");
+const sellProductsModel = require("../sell/models/sellProductsModel");
+const returnProductsModel = require("../return/models/returnProductsModel");
 
 exports.productCreateController = async (req, res, next) => {
     try {
@@ -95,3 +102,37 @@ exports.productFindController = async (req, res, next) => {
         next(error);
     }
 };
+
+
+exports.productDeleteController = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const userId = req.user.id;
+
+        const data = {};
+        data.id = id;
+        data.userId = userId;
+        data.message = 'Product has been Deleted!';
+
+        const existingDocument = await checkExitDocumentService(purchaseProductsModel, { productId: new Types.ObjectId(id) });
+        const existingDocument2 = await checkExitDocumentService(sellProductsModel, { productId: new Types.ObjectId(id) });
+        const existingDocument3 = await checkExitDocumentService(returnProductsModel, { productId: new Types.ObjectId(id) });
+
+        if (existingDocument) {
+            throw createError('Product can not be deleted because it is associated with purchases.');
+        } else if (existingDocument2) {
+            throw createError('Product can not be deleted because it is associated with sells.');
+
+        } else if (existingDocument3) {
+            throw createError('Product can not be deleted because it is associated with returns.');
+        }
+        else {
+            const result = await deleteService(productModel, data);
+
+            return res.status(200).json(result)
+        }
+
+    } catch (error) {
+        next(error);
+    }
+}

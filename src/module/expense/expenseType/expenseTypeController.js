@@ -3,7 +3,12 @@ const { dropdownService } = require("../../common/services/dropdownService");
 const { findDataService } = require("../../common/services/findDataService");
 const { updateService } = require("../../common/services/updateService");
 const expenseTypeModel = require("./expenseTypeModel");
+const expenseModel = require("../expenseModel");
 const { expenseTypeValidationSchema } = require("./expenseTypeValidation");
+const { deleteService } = require("../../common/services/deleteService");
+const createError = require("http-errors");
+const { Types } = require("mongoose");
+const { checkExitDocumentService } = require("../../common/services/checkExitDocument");
 
 
 exports.expenseTypeCreateController = async (req, res, next) => {
@@ -100,3 +105,30 @@ exports.expenseTypeDropdownController = async (req, res, next) => {
         next(error);
     }
 };
+
+
+
+exports.expenseTypeDeleteController = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const userId = req.user.id;
+
+        const data = {};
+        data.id = id;
+        data.userId = userId;
+        data.message = 'Expense type has been Deleted!';
+
+        const existingDocument = await checkExitDocumentService(expenseModel, { expenseTypeId: new Types.ObjectId(id) });
+
+        if (existingDocument) {
+            throw createError('Expense Type can not be deleted because it is associated with expense.');
+        } else {
+            const result = await deleteService(expenseTypeModel, data);
+
+            return res.status(200).json(result)
+        }
+
+    } catch (error) {
+        next(error);
+    }
+}

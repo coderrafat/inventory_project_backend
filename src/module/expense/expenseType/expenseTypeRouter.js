@@ -1,5 +1,5 @@
 const { isLoggedIn } = require('../../../middlewares/auth');
-const { expenseTypeCreateController, expenseTypeUpdateController, expenseTypeFindController, expenseTypeDropdownController } = require('./expenseTypeController');
+const { expenseTypeCreateController, expenseTypeUpdateController, expenseTypeFindController, expenseTypeDropdownController, expenseTypeDeleteController } = require('./expenseTypeController');
 
 const expenseTypeRouter = require('express').Router();
 
@@ -10,6 +10,8 @@ expenseTypeRouter.put('/update/:expenseTypeId', isLoggedIn, expenseTypeUpdateCon
 expenseTypeRouter.get('/', isLoggedIn, expenseTypeFindController);
 
 expenseTypeRouter.get('/dropdown', isLoggedIn, expenseTypeDropdownController);
+
+expenseTypeRouter.delete('/delete/:id', isLoggedIn, expenseTypeDeleteController);
 
 
 module.exports = expenseTypeRouter;

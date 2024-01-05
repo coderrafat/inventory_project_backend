@@ -1,9 +1,15 @@
+const { Types } = require("mongoose");
+const { checkExitDocumentService } = require("../common/services/checkExitDocument");
 const { createService } = require("../common/services/createService");
 const { dropdownService } = require("../common/services/dropdownService");
 const { findDataService } = require("../common/services/findDataService");
 const { updateService } = require("../common/services/updateService");
+const returnModel = require("../return/models/returnModel");
+const sellModel = require("../sell/models/sellModel");
 const customerModel = require("./customerModel");
 const { customerValidationSchema } = require("./customerValidation");
+const createError = require('http-errors');
+const { deleteService } = require("../common/services/deleteService");
 
 
 exports.customerCreateController = async (req, res, next) => {
@@ -101,3 +107,34 @@ exports.customerDropdownController = async (req, res, next) => {
         next(error);
     }
 };
+
+
+exports.customerDeleteController = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const userId = req.user.id;
+
+        const data = {};
+        data.id = id;
+        data.userId = userId;
+        data.message = 'Customer has been Deleted!';
+
+        const existingDocument = await checkExitDocumentService(sellModel, { customerId: new Types.ObjectId(id) });
+        const existingDocument2 = await checkExitDocumentService(returnModel, { customerId: new Types.ObjectId(id) });
+
+        if (existingDocument) {
+            throw createError('Customer can not be deleted because it is associated with sells.');
+
+        } else if (existingDocument2) {
+            throw createError('Customer can not be deleted because it is associated with returns.');
+        }
+        else {
+            const result = await deleteService(customerModel, data);
+
+            return res.status(200).json(result)
+        }
+
+    } catch (error) {
+        next(error);
+    }
+}
